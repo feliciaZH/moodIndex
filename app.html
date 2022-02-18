@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    />
+    <title>demo页面</title>
+    <style>
+      html {
+        -ms-text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+        -webkit-tap-highlight-color: transparent;
+        height: 100%;
+        width: 100%;
+      }
+      body {
+        margin: 0;
+        font-size: 14px;
+        font-family: 'Helvetica Neue', Helvetica, STHeiTi, Arial, sans-serif;
+        line-height: 1.5;
+        color: #333;
+        background-color: #fff;
+        height: 100%;
+        width: 100%;
+      }
+      p {
+        margin: 0;
+        padding: 0;
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+      }
+      .line_box {
+        height: 258px;
+        width: 44px;
+        position: relative;
+        border-radius: 30px;
+        background-color: #52C873;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 0 4px 0;
+        animation-name: line_anim;
+        animation-duration: 1s;
+        transition: transform 0.5s ease-in-out 0.5s;
+      }
+      .line_box:hover{
+        background: linear-gradient(180deg, #42F373 42.71%, #A1FD44 100%);
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+        transform:scale(1.05);
+      }
+
+      .score_box {
+  
+        color: white;
+        width: 100%;
+        height: 25px;
+        font-family: Nunito;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 25px;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        letter-spacing: -0.3px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .face_box {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 100%;
+        background-color: white;
+      }
+      .xiao {
+        text-align: center;
+      }
+      .yan {
+        height: 48%;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        align-items: end;
+      }
+      .xiao_yan1,
+      .xiao_yan2 {
+        display: inline-block;
+        height: 6px;
+        width: 3px;
+        background: #52C873;
+        border-radius: 13.0909px;
+      }
+      .xiao_zui {
+        display: inline-block;
+        width: 12px;
+        height: 4px;
+        border: 2px solid #52C873;
+        border-radius: 0 0 50% 50%/0 0 100% 100%;
+        border-top: none;
+        margin-bottom: 4px;
+      }
+      .mimi {
+        text-align: center;
+      }
+      .mimi_yan1 {
+        display: inline-block;
+        width: 7px;
+        height: 3px;
+        border: 2px solid #FF823C;
+        border-radius: 50% 50% 0 0/100% 100% 0 0;
+        border-bottom: none;
+      }
+      .mimi_yan2_box {
+        position: relative;
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+      }
+      .mimi_yan2 {
+        position: relative;
+        left: -8px;
+        top: 2px;
+      }
+      .mimi_yan2:before,
+      .mimi_yan2:after {
+        position: absolute;
+        content: '';
+        border-top: 4px transparent dashed;
+        border-left: 4px transparent dashed;
+        border-bottom: 4px transparent dashed;
+        border-right: 4px #FF823C solid;
+      }
+      .mimi_yan2:before {
+        border-right: 4px #FF823C solid;
+      }
+      .mimi_yan2:after {
+        left: 2px; /*覆盖调整箭头粗细*/
+        border-right: 4px #fff solid;
+      }
+      .mimi_zui {
+        display: inline-block;
+        width: 10px;
+        height: 4px;
+        border: 2px solid #FF823C;
+        border-radius: 0 0 50% 50%/0 0 100% 100%;
+        margin-bottom: 3px;
+      }
+      .question {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Nunito;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 32px;
+        line-height: 44px;
+        display: flex;
+        text-align: center;
+        letter-spacing: -0.3px;
+        color: #929292;
+
+      }
+      .week_box{
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          align-items: center;
+          margin-left: 12px;
+          margin-top: 50px;
+          height: 288px;
+          
+      }
+
+      .week_day{
+          /* content_18 */
+
+        font-family: PingFang HK;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 18px;
+        height: 25px;
+        line-height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: -0.3px;
+        margin-top: 17px;
+        /* Function 33 */
+
+        color: #2D2F33;
+
+      }
+      .line_box:hover+.week_day{
+        width: 36px;
+        height: 36px;
+        background: #FFFFFF;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        
+        /* cate green */
+
+        color: #52C873;
+      }
+      .low{
+        background: #CFCFCF;
+      }
+      .good{
+        background: #52C873;
+      }
+      .high{
+        background: #FF823C;
+      }
+      /* 动画代码 */
+    @keyframes line_anim {
+        0%   {height: 65px;}
+        100% {height: 258px;}
+    }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="week_box">
+        <!-- 柱状图 -->
+        <div class="line_box good">
+            <!-- 分数 -->
+            <p class="score_box">
+            <span>86</span>
+            </p>
+            <!-- 脸型通用class= face_box;   笑脸class=xiao;  眯眯眼class= mimi; 问号class=question -->
+            <div class="face_box xiao">
+            <div class="yan">
+                <i class="xiao_yan1"></i>
+                <i class="xiao_yan2"></i>
+            </div>
+            <i class="xiao_zui"></i>
+            </div>
+        </div>
+        <p class="week_day">六</p>
+      </div>
+
+      <!-- 柱状图 -->
+      <div class="week_box">
+        <div class="line_box high">
+            <!-- 分数 -->
+            <p class="score_box">
+            <span>80</span>
+            </p>
+            <!-- 脸型通用class= face_box;   笑脸class=xiao;  眯眯眼class= mimi; 问号class=question -->
+            <div class="face_box mimi">
+            <div class="yan">
+                <i class="mimi_yan1"></i>
+                <p class="mimi_yan2_box">
+                <i class="mimi_yan2"></i>
+                </p>
+            </div>
+            <i class="mimi_zui"></i>
+            </div>
+        </div>
+        <p class="week_day">日</p>
+      </div>
+      <!-- 柱状图 -->
+      <div class="week_box">
+        <div class="line_box low">
+            <!-- 分数 -->
+            <p class="score_box">
+            <span>90</span>
+            </p>
+            <!-- 脸型通用class= face_box;   笑脸class=xiao;  眯眯眼class= mimi; 问号class=question -->
+            <div class="face_box question">
+            <span>?</span>
+            </div>
+        </div>
+        <p class="week_day">一</p>
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    ;(function () {
+      const arr = [
+        {
+          x: '六',
+          y: 86
+        },
+        {
+          x: '日',
+          y: 80
+        },
+        {
+          x: '一',
+          y: 35
+        },
+        {
+          x: '二',
+          y: 90
+        },
+        {
+          x: '三',
+          y: 92
+        },
+        {
+          x: '四',
+          y: 97
+        },
+        {
+          x: '五',
+          y: 81
+        }
+      ]
+    })()
+  </script>
+</html>
