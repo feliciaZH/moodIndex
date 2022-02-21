@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import {
   SafeAreaView,
   ScrollView,
@@ -17,9 +17,11 @@ import {
   View,
   Button,
   Image,
+  ImageBackground,
   PanResponder,
   Animated,
-  useWindowDimensions 
+  useWindowDimensions, 
+  Easing
 } from 'react-native'
 
 import {
@@ -35,9 +37,12 @@ import orangeFace2x from './image/orangeFace2x.png'
 import userIcon from './image/userIcon.png'
 import Vector_28 from './image/Vector_28.png'
 import base2x from './image/base2x.png'
+import whiteBg from './image/whiteBg.png'
 import array from './AppData'
 const totalH = 266
-import {BoxShadow} from 'react-native-shadow'
+import {BoxShadow} from 'react-native-shadow'// 阴影
+import LinearGradient from 'react-native-linear-gradient'// 渐变
+
 
 
 
@@ -90,15 +95,85 @@ function BoxShadowItem (props) {
     </BoxShadow>
   )
 }
-function UnBoxShadowItem (props) {
-  const item = props.item
-  const everyLineW = props.everyLineW
+class UnBoxShadowItem extends React.Component {
+  constructor() {
+      super();
+      this.state = {
+          height: new Animated.Value(65),
+          opacity: new Animated.Value(0.2),
+      };
+  }
+  componentDidMount(){
+    const item = this.props.item;
+    const style = item.style;
+    if(!item.AnimatedFinish){
+      this.startAni();
+    }else{
+      this.setState({height: style[1].height});
+      this.setState({opacity: 1});
+    }
+    
+  }
+  render() {
+    const props = this.props;
+    const item = props.item
+    const everyLineW = props.everyLineW
 
+    return (
+      <Animated.View style={[styles.line_box, ...item.style, {width: everyLineW, height: this.state.height, opacity: this.state.opacity}]}>
+        <Text style={styles.score_box}>{item.y}</Text>
+        <Image source={item.img} style={styles.face_box} />
+      </Animated.View>
+    )
+  }
+
+  startAni = () => {
+    const props = this.props;
+    const item = props.item
+    console.log('startAni',props)
+    Animated.parallel([ 
+      Animated.timing(this.state.height, {
+          toValue:  item.style[1].height,
+          duration: 100*(item.index + 1),
+          delay: 42*(item.index + 1),
+          easing: Easing.ease,
+          useNativeDriver: false
+      }), 
+      Animated.timing(this.state.opacity, { 
+        toValue: 1, 
+        duration: 82*(item.index+1),
+        delay: 42*item.index,
+        easing: Easing.ease,
+        useNativeDriver: false
+      }) 
+    ],{
+      stopTogether: false
+    }).start(() => { 
+        // callback 
+        item.AnimatedFinish = true;
+    }); 
+  };
+}
+function WeekDayText(props){
+  const item = props.item;
+  const day = props.day;
+  const clickIndex = props.clickIndex
   return (
-    <View style={[styles.line_box, ...item.style, {width: everyLineW}]}>
-      <Text style={styles.score_box}>{item.y}</Text>
-      <Image source={item.img} style={styles.face_box} />
-    </View>
+    <Text style={item.day === day ? styles.week_day_color: ''}>{item.x}</Text>
+  );
+}
+function WeekDayTextHover(props){
+  const item = props.item;
+  const day = props.day;
+  return(
+    <ImageBackground source={whiteBg} style={[{ width: 56,
+    height: 56}]}>
+      <Text style={[styles.week_day_color_hover,{ position: "absolute",
+    bottom: 20,
+    left: "50%",
+    transform: [{translateX: -8}]
+    }]}>{item.x}</Text>
+    </ImageBackground>
   )
 }
 function Listitem (props) {
@@ -110,6 +185,7 @@ function Listitem (props) {
   function curHandleClick (item) {
     props.handleClick(item)
   }
+  const day = props.day;
   return (
     <View
       style={styles.week_box}
@@ -121,12 +197,18 @@ function Listitem (props) {
       ) : (
         <UnBoxShadowItem item={item} everyLineW={props.everyLineW}/>
       )}
-      <View style={[styles.week_day, item.clicked || clickIndex === item.index ? styles.week_day_hover:'']}>
-        <Text>{item.x}</Text>
+      <View style={[styles.week_day, item.clicked || clickIndex === item.index ?'':(item.day === day ? styles.week_day_hover:'')]}>
+        {item.clicked || clickIndex === item.index ?(
+          <WeekDayTextHover item={item} day={day}/>
+        ):(
+          <WeekDayText item={item} day={day}/>
+        )}
+        
       </View>
     </View>
   )
 }
+
 function List (props) {
   const arraySrc = props.array
   arraySrc.forEach((val, index) => {
@@ -152,8 +234,9 @@ function List (props) {
   const handleClick = item => {
     console.log('子元素传递过来的值为：', item) //子元素传递过来的值为：100
     item.clicked = true
+    item.isInit = true
     setClickIndex(item.index)
-    resetArray(item)
+    //resetArray(item)
   }
   const resetArray = item => {
     array[item.index] = item
@@ -162,6 +245,10 @@ function List (props) {
     })
     setArray([...array]) // 没有响应式
   }
+
+  let date = new Date()
+  let day = date.getDay();
+
   const listItems = array.map(item => (
     <Listitem
       everyLineW={props.everyLineW}
@@ -169,30 +256,33 @@ function List (props) {
       item={item}
       handleClick={handleClick}
       clickIndex={clickIndex}
+      day={day}
     />
   ))
   return <View style={[styles.app]}>{listItems}</View>
 }
 function UserInfo (props) {
-  // const shadowOpt = {
-  //   width: 390,
-  //   height: 260,
-  //   color: '#fff',
-  //   radius: 16,
-  //   opacity: 0.15,
-  //   border: 4,
-  //   x: 0,
-  //   y: -6,
-  // }
+  const windowHeight = props.windowHeight;
+  const userH = windowHeight - 336 - 88 - 20;// 整个用户信息名片的高度
+  // 分为上间距：43，头像：42，分数：98，标签：25，下间距：34
+  const designH = 43 + 42 + 98 + 25 + 34;
+  const iconTopH = userH*(43/designH)
+  const iconH = userH*(42/designH)
+  const scoreH = userH*(98/designH)
+  const scoreFontSize = userH*(72/designH)
+  const labelH = userH*(25/designH) + userH*(26/designH)
+  console.log(iconTopH,iconH,scoreH,scoreFontSize,labelH)
   return (
 
-      <View style={styles.user_info}>
-        <View style={styles.first_line}>
-          <Image source={userIcon} style={styles.user_icon} />
+      <View style={[styles.user_info,{height: userH}]}>
+        <View style={[styles.first_line,{marginTop: iconTopH}]}>
+          <View style={styles.space}>
+            <Image source={userIcon} style={[styles.user_icon, {height: iconH, width: iconH}]} />
+          </View>
           <Text style={styles.user_name}>李强</Text>
         </View>
-        <Text style={styles.second_line}>88</Text>
-        <Text style={styles.third_line}>周平均心情指数</Text>
+        <Text style={[styles.second_line,{height: scoreH, lineHeight: scoreH, fontSize: scoreFontSize}]}>88</Text>
+        <Text style={[styles.third_line,{height: labelH, lineHeight: labelH}]}>周平均心情指数</Text>
       </View>
   
   )
@@ -221,14 +311,30 @@ const App = () => {
       <Nav />
       
       <ScrollView >
-        <UserInfo />
+        <UserInfo windowHeight={windowHeight}/>
         <List array={array} everyLineW={everyLineW}/>
+        <LinearGradient colors={['#FFD801', '#FF8040', '#F75D59']} style={styles.linearGradient}>
+          <Text style={{color:'#fff'}}>
+            Sign in with Facebook
+          </Text>
+        </LinearGradient>
+
+      
       </ScrollView>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
+  linearGradient: {
+    justifyContent:'center',
+    alignItems:'center',
+    width:200,
+    height:50,
+    paddingLeft: 15,
+    paddingRight: 15,
+    borderRadius: 5
+  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -307,7 +413,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 6,
     width: 3,
-    background: '#52C873',
+    backgroundColor: '#52C873',
     borderRadius: 13,
   },
   xiao_zui: {
@@ -373,7 +479,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginTop: 50,
     height: 288,
-    marginBottom: 150
+    marginBottom: 100
   },
 
   week_day: {
@@ -391,8 +497,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     marginTop: 17,
     /* Function 33 */
-
-    color: '#2D2F33',
   },
   week_day_hover: {
     width: 36,
@@ -400,7 +504,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2D2F33',
     borderRadius: 8,
     /* cate green */
+    color: 'white',
+  },
+  week_day_color: {
+    color: 'white'
+  },
+  week_day_color_hover: {
+    borderRadius: 8,
     color: '#52C873'
+    /* #F36A1B*/
   },
   low: {
     backgroundColor: '#CFCFCF',
@@ -437,16 +549,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 24
   },
+  space: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent:'center',
+  },
   first_line: {
-    width: 150,
     display: 'flex',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     marginTop: 44,
     background:`url(${base2x})`
   },
   user_icon: {
+    
     width: 80,
     height: 80,
     borderWidth: 1,
@@ -475,13 +593,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     textAlign: 'center',
+    textAlignVertical: 'center',
     letterSpacing: -0.3,
     color: 'rgba(45, 47, 51, 1)',
-    flex:1
+    flex: 1
   },
   third_line: {
     flex:1,
-    width: 125,
     height: 25,
     fontFamily: 'PingFang HK',
     fontStyle: 'normal',
@@ -495,7 +613,7 @@ const styles = StyleSheet.create({
 
     /* Function ae */
 
-    color: 'rgba(146, 146, 146, 1)',
+    color: 'rgba(146, 146, 146, 1)'
   },
   nav: {
     display: 'flex',
