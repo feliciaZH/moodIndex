@@ -169,6 +169,7 @@
         text-align: center;
         letter-spacing: -0.3px;
         color: #929292;
+        z-index: 2;
 
       }
       .week_box{
@@ -221,6 +222,13 @@
       .high{
         background: #FF823C;
       }
+      .line {
+        margin-top: 100px;
+        width: 900px;
+        border-bottom: 1px solid #000000;
+        float: left;
+        z-index: 1;
+      }
       /* 动画代码 */
     @keyframes line_anim {
         0%   {height: 65px;}
@@ -229,7 +237,9 @@
     </style>
   </head>
   <body>
+    <div class="line"></div>
     <div id="app">
+      
       <div class="week_box">
         <!-- 柱状图 -->
         <div class="line_box good">
@@ -284,6 +294,7 @@
         <p class="week_day">一</p>
       </div>
     </div>
+    
   </body>
   <script type="text/javascript">
     ;(function () {

@@ -38,6 +38,8 @@ import userIcon from './image/userIcon.png'
 import Vector_28 from './image/Vector_28.png'
 import base2x from './image/base2x.png'
 import whiteBg from './image/whiteBg.png'
+import line from './image/line.png'
+import line1 from './image/line1.png'
 import array from './AppData'
 const totalH = 266
 import {BoxShadow} from 'react-native-shadow' // 阴影
@@ -83,14 +85,13 @@ function BoxShadowItem (props) {
   css.push(styles.line_box_hover)
   css.push({width: everyLineW + 3})
   css.push(item.hover)
-  const [scale, setScale] = useState(new Animated.Value(1));
+  const [scale, setScale] = useState(new Animated.Value(1))
   // 模拟DidMount
   useEffect(() => {
     // transform: [{scale: 1.05}]
     startAni(item)
   }, [])
-  const startAni = (item) => {
-    
+  const startAni = item => {
     console.log('startAni', props)
     Animated.timing(scale, {
       toValue: 1.05,
@@ -100,17 +101,16 @@ function BoxShadowItem (props) {
       useNativeDriver: false,
     }).start(() => {
       // callback
-      
     })
   }
   return (
-    <Animated.View style={{transform:[{scale: scale}]}}>
-    <BoxShadow setting={shadowOpt}>
-      <LinearGradient colors={item.hoverColor} style={css}>
-        <Text style={styles.score_box}>{item.y}</Text>
-        <Image source={item.img} style={styles.face_box} />
-      </LinearGradient>
-    </BoxShadow>
+    <Animated.View style={{transform: [{scale: scale}]}}>
+      <BoxShadow setting={shadowOpt}>
+        <LinearGradient colors={item.hoverColor} style={css}>
+          <Text style={styles.score_box}>{item.y}</Text>
+          <Image source={item.img} style={styles.face_box} />
+        </LinearGradient>
+      </BoxShadow>
     </Animated.View>
   )
 }
@@ -217,40 +217,42 @@ function Listitem (props) {
   const item = props.item
   // const refresh = props.refresh;
   const clickIndex = props.clickIndex
-  const marginLeft = item.index === 0 ? 13 : 6;
-  const marginBottom = item.index === (array.length - 1) ? 13 : 6;
+  let marginLeft = item.index === 0 ? 20 : 6;// 初始值
+  let marginRight = item.index === (array.length - 1) ? 20 : 6;// 初始值
+  marginLeft = item.clicked || clickIndex === item.index ? marginLeft - 6 : marginLeft
+  marginRight = item.clicked || clickIndex === item.index ? marginRight - 6 : marginRight
 
   function curHandleClick (item) {
     props.handleClick(item)
   }
   const day = props.day
   return (
-    <View
-      style={[styles.week_box, {marginLeft: marginLeft}]}
-      onTouchStart={e => console.log('start')}
-      onTouchMove={e => console.log('move')}
-      onTouchEnd={e => curHandleClick(item)}>
-      {item.clicked || clickIndex === item.index ? (
-        <BoxShadowItem item={item} everyLineW={props.everyLineW} />
-      ) : (
-        <UnBoxShadowItem item={item} everyLineW={props.everyLineW} />
-      )}
       <View
-        style={[
-          styles.week_day,
-          item.clicked || clickIndex === item.index
-            ? ''
-            : (item.day === day
-            ? styles.week_day_hover
-            : ''),
-        ]}>
+        style={[styles.week_box, {marginLeft: marginLeft}]}
+        onTouchStart={e => console.log('start')}
+        onTouchMove={e => console.log('move')}
+        onTouchEnd={e => curHandleClick(item)}>
         {item.clicked || clickIndex === item.index ? (
-          <WeekDayTextHover item={item} day={day} />
+          <BoxShadowItem item={item} everyLineW={props.everyLineW} />
         ) : (
-          <WeekDayText item={item} day={day} />
+          <UnBoxShadowItem item={item} everyLineW={props.everyLineW} />
         )}
+        <View
+          style={[
+            styles.week_day,
+            item.clicked || clickIndex === item.index
+              ? ''
+              : item.day === day
+              ? styles.week_day_hover
+              : '',
+          ]}>
+          {item.clicked || clickIndex === item.index ? (
+            <WeekDayTextHover item={item} day={day} />
+          ) : (
+            <WeekDayText item={item} day={day} />
+          )}
+        </View>
       </View>
-    </View>
   )
 }
 
@@ -321,7 +323,7 @@ function UserInfo (props) {
   const iconH = userH * (42 / designH)
   const scoreH = userH * (98 / designH)
   const scoreFontSize = userH * (72 / designH)
-  const labelH = userH * (25 / designH) + userH * (26 / designH)
+  const labelH = userH * (25 / designH)
   console.log(iconTopH, iconH, scoreH, scoreFontSize, labelH)
   return (
     <View style={[styles.user_info, {height: userH}]}>
@@ -334,13 +336,14 @@ function UserInfo (props) {
         </View>
         <Text style={styles.user_name}>李强</Text>
       </View>
-      <Text
+      <View
         style={[
-          styles.second_line,
-          {height: scoreH, lineHeight: scoreH, fontSize: scoreFontSize},
+        
+          {height: scoreH, lineHeight: scoreH},
         ]}>
-        88
-      </Text>
+        <Text style={[styles.second_line,{ fontSize: scoreFontSize}]}>88</Text>
+      </View>
+
       <Text style={[styles.third_line, {height: labelH, lineHeight: labelH}]}>
         周平均心情指数
       </Text>
@@ -363,15 +366,18 @@ const App = () => {
   }
   const windowWidth = useWindowDimensions().width
   const windowHeight = useWindowDimensions().height
-  const everyLineW = windowWidth / 7 - 14
+  const everyLineW = windowWidth / 7 - 15
 
   return (
     <SafeAreaView>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <Nav />
+      
       <ScrollView>
         <UserInfo windowHeight={windowHeight} />
+        <View style={[styles.line]}></View>
         <List array={array} everyLineW={everyLineW} />
+        
       </ScrollView>
     </SafeAreaView>
   )
@@ -399,6 +405,7 @@ const styles = StyleSheet.create({
     height: '100%',
     display: 'flex',
     flexDirection: 'row',
+    backgroundColor: 'transparent'
   },
   line_box: {
     height: 258,
@@ -523,6 +530,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
     height: 288,
     marginBottom: 100,
+    zIndex: 2,
+    elevation: 2
   },
 
   week_day: {
@@ -549,23 +558,23 @@ const styles = StyleSheet.create({
     /* cate green */
     color: 'white',
     marginTop: 18,
-    top: 3
+    top: 3,
   },
   week_day_color: {
     color: 'white',
   },
   week_day_color_hover_low: {
     borderRadius: 8,
-    color: '#2D2F33'
+    color: '#2D2F33',
   },
   week_day_color_hover_good: {
     borderRadius: 8,
-    color: '#52C873'
+    color: '#52C873',
     /* #F36A1B*/
   },
   week_day_color_hover_high: {
     borderRadius: 8,
-    color: '#F36A1B'
+    color: '#F36A1B',
     /* #F36A1B*/
   },
   low: {
@@ -643,19 +652,17 @@ const styles = StyleSheet.create({
   },
   second_line: {
     width: 87,
-    height: 98,
     fontFamily: 'Nunito',
     fontStyle: 'normal',
     fontWeight: '800',
     fontSize: 72,
-    lineHeight: 98,
     display: 'flex',
     alignItems: 'center',
     textAlign: 'center',
     textAlignVertical: 'center',
     letterSpacing: -0.3,
     color: 'rgba(45, 47, 51, 1)',
-    flex: 1,
+    flex: 1
   },
   third_line: {
     flex: 1,
@@ -703,6 +710,19 @@ const styles = StyleSheet.create({
 
     color: '#2D2F33',
   },
+  line: {
+    borderRadius: 16,
+    marginLeft: 12,
+    marginRight: 12,
+    zIndex: -5,
+    elevation: -5,
+    marginTop: 0,
+    borderBottomWidth: 2,
+    borderBottomColor:'#F2F2F2',
+    borderStyle: 'solid',
+    float: 'left',
+
+  }
 })
 
 export default App
