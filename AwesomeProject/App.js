@@ -38,8 +38,6 @@ import userIcon from './image/userIcon.png'
 import Vector_28 from './image/Vector_28.png'
 import base2x from './image/base2x.png'
 import whiteBg from './image/whiteBg.png'
-import line from './image/line.png'
-import line1 from './image/line1.png'
 import array from './AppData'
 const totalH = 266
 import {BoxShadow} from 'react-native-shadow' // 阴影
@@ -62,7 +60,7 @@ const panResponderTemp = PanResponder.create({
   },
   onPanResponderRelease: (evt, gs) => {
     // 滑动响应事件
-    console.log(evt) // 父组件告诉子组件，我被点击了
+    // console.log(evt) // 父组件告诉子组件，我被点击了
     const [clickEvet, setClickEvent] = useState(null)
     setClickEvent(evt)
   },
@@ -74,8 +72,8 @@ function BoxShadowItem (props) {
   const shadowOpt = {
     width: everyLineW + 3,
     height: item.style[1].height,
-    color: '#000',
-    radius: 20,
+    color: '#000000',
+    radius: 18,
     opacity: 0.15,
     border: 3,
     x: 0,
@@ -88,11 +86,10 @@ function BoxShadowItem (props) {
   const [scale, setScale] = useState(new Animated.Value(1))
   // 模拟DidMount
   useEffect(() => {
-    // transform: [{scale: 1.05}]
     startAni(item)
   }, [])
   const startAni = item => {
-    console.log('startAni', props)
+    // console.log('startAni', props)
     Animated.timing(scale, {
       toValue: 1.05,
       duration: 300,
@@ -157,7 +154,7 @@ class UnBoxShadowItem extends React.Component {
   startAni = () => {
     const props = this.props
     const item = props.item
-    console.log('startAni', props)
+    // console.log('startAni', props)
     Animated.parallel(
       [
         Animated.timing(this.state.height, {
@@ -229,8 +226,8 @@ function Listitem (props) {
   return (
       <View
         style={[styles.week_box, {marginLeft: marginLeft}]}
-        onTouchStart={e => console.log('start')}
-        onTouchMove={e => console.log('move')}
+        onTouchStart={e => undefined}
+        onTouchMove={e => undefined}
         onTouchEnd={e => curHandleClick(item)}>
         {item.clicked || clickIndex === item.index ? (
           <BoxShadowItem item={item} everyLineW={props.everyLineW} />
@@ -285,7 +282,7 @@ function List (props) {
   // const [refresh, setRefresh] = useState(false);
   const [clickIndex, setClickIndex] = useState(-1)
   const handleClick = item => {
-    console.log('子元素传递过来的值为：', item) //子元素传递过来的值为：100
+    // console.log('子元素传递过来的值为：', item) //子元素传递过来的值为：100
     item.clicked = true
     item.isInit = true
     setClickIndex(item.index)
@@ -324,7 +321,7 @@ function UserInfo (props) {
   const scoreH = userH * (98 / designH)
   const scoreFontSize = userH * (72 / designH)
   const labelH = userH * (25 / designH)
-  console.log(iconTopH, iconH, scoreH, scoreFontSize, labelH)
+  // console.log(iconTopH, iconH, scoreH, scoreFontSize, labelH)
   return (
     <View style={[styles.user_info, {height: userH}]}>
       <View style={[styles.first_line, {marginTop: iconTopH}]}>
@@ -366,8 +363,11 @@ const App = () => {
   }
   const windowWidth = useWindowDimensions().width
   const windowHeight = useWindowDimensions().height
-  const everyLineW = windowWidth / 7 - 15
+  const everyLineW = (windowWidth - 12*8 - 3*7) / 7;
 
+  const marginTop = windowHeight - 336 - 20 + 10 // 整个用户信息名片的高度
+
+  // console.log(marginTop)
   return (
     <SafeAreaView>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
@@ -375,10 +375,12 @@ const App = () => {
       
       <ScrollView>
         <UserInfo windowHeight={windowHeight} />
-        <View style={[styles.line]}></View>
+        
         <List array={array} everyLineW={everyLineW} />
         
       </ScrollView>
+      <View style={[styles.line,{marginTop: marginTop}]}></View>
+      <View style={[styles.line,{marginTop: marginTop + totalH/2}]}></View>
     </SafeAreaView>
   )
 }
@@ -413,7 +415,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderRadius: 30,
     backgroundColor: '#52C873',
-
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -651,7 +652,7 @@ const styles = StyleSheet.create({
     color: '#2D2F33',
   },
   second_line: {
-    width: 87,
+ 
     fontFamily: 'Nunito',
     fontStyle: 'normal',
     fontWeight: '800',
@@ -711,16 +712,16 @@ const styles = StyleSheet.create({
     color: '#2D2F33',
   },
   line: {
+    marginTop: 400,
+    borderBottomWidth: 2,
+    borderStyle: 'solid',
+    borderColor: '#F2F2F2',
     borderRadius: 16,
-    marginLeft: 12,
-    marginRight: 12,
+    left: 12,
+    right: 12,
     zIndex: -5,
     elevation: -5,
-    marginTop: 0,
-    borderBottomWidth: 2,
-    borderBottomColor:'#F2F2F2',
-    borderStyle: 'solid',
-    float: 'left',
+    position: 'absolute',
 
   }
 })
