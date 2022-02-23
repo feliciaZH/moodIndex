@@ -40,6 +40,10 @@ import base2x from './image/base2x.png'
 import whiteBg from './image/whiteBg.png'
 import array from './AppData'
 const totalH = 266
+const UserInfoDH = 256
+const designTotalH = 894;
+const titleDH = 64;
+const UserInfoMarginTopDH = 18;
 import {BoxShadow} from 'react-native-shadow' // 阴影
 import LinearGradient from 'react-native-linear-gradient' // 渐变
 
@@ -255,21 +259,22 @@ function Listitem (props) {
 
 function List (props) {
   const arraySrc = props.array
+  let zhuH = props.zhuH;
   arraySrc.forEach((val, index) => {
     if (val.y < 50) {
-      val.style = [styles.low, {height: (val.y / 100) * totalH}]
+      val.style = [styles.low, {height: (val.y / 100) * zhuH}]
       val.hoverColor = ['#CFCFCF', '#CFCFCF']
       val.hover = styles.hover_low
       val.week_day_color_hover = styles.week_day_color_hover_low
       val.img = question2x
     } else if (val.y < 90) {
-      val.style = [styles.good, {height: (val.y / 100) * totalH}]
+      val.style = [styles.good, {height: (val.y / 100) * zhuH}]
       val.hoverColor = ['#42F373', '#A1FD44']
       val.hover = styles.hover_good
       val.week_day_color_hover = styles.week_day_color_hover_good
       val.img = greenFace2x
     } else {
-      val.style = [styles.high, {height: (val.y / 100) * totalH}]
+      val.style = [styles.high, {height: (val.y / 100) * zhuH}]
       val.hoverColor = ['#FFA14A', '#FFCC4A']
       val.hover = styles.hover_high
       val.week_day_color_hover = styles.week_day_color_hover_high
@@ -313,43 +318,46 @@ function List (props) {
 }
 function UserInfo (props) {
   const windowHeight = props.windowHeight
-  const userH = windowHeight - 336 - 88 - 20 // 整个用户信息名片的高度
+  const userH = props.userInfoH // 整个用户信息名片的高度
   // 分为上间距：43，头像：42，分数：98，标签：25，下间距：34
-  const designH = 43 + 42 + 98 + 25 + 34
-  const iconTopH = userH * (43 / designH)
-  const iconH = userH * (42 / designH)
-  const scoreH = userH * (98 / designH)
-  const scoreFontSize = userH * (72 / designH)
-  const labelH = userH * (25 / designH)
-  // console.log(iconTopH, iconH, scoreH, scoreFontSize, labelH)
-  return (
-    <View style={[styles.user_info, {height: userH}]}>
-      <View style={[styles.first_line, {marginTop: iconTopH}]}>
-        <View style={styles.space}>
-          <Image
-            source={userIcon}
-            style={[styles.user_icon, {height: iconH, width: iconH}]}
-          />
-        </View>
-        <Text style={styles.user_name}>李强</Text>
-      </View>
-      <View
-        style={[
-        
-          {height: scoreH, lineHeight: scoreH},
-        ]}>
-        <Text style={[styles.second_line,{ fontSize: scoreFontSize}]}>88</Text>
-      </View>
+  const iconTopH = userH * (43 / UserInfoDH)
+  const iconH = userH * (42 / UserInfoDH)
+  const scoreH = userH * (98 / UserInfoDH)
+  const scoreFontSize = userH * (72 / UserInfoDH)
+  const labelH = userH * (25 / UserInfoDH)
+  const marginTop = props.userMarginTop;
+  console.log(marginTop)
 
-      <Text style={[styles.third_line, {height: labelH, lineHeight: labelH}]}>
-        周平均心情指数
-      </Text>
-    </View>
+  return (
+    <ImageBackground source={base2x} style={[{width: '100%', height: userH, marginTop: marginTop}]}>
+      <View style={[styles.user_info, {height: userH}]}>
+        <View style={[styles.first_line, {marginTop: iconTopH}]}>
+          <View style={styles.space}>
+            <Image
+              source={userIcon}
+              style={[styles.user_icon, {height: iconH, width: iconH}]}
+            />
+          </View>
+          <Text style={styles.user_name}>李强</Text>
+        </View>
+        <View
+          style={[
+          
+            {height: scoreH, lineHeight: scoreH},
+          ]}>
+          <Text style={[styles.second_line,{ fontSize: scoreFontSize}]}>88</Text>
+        </View>
+
+        <Text style={[styles.third_line, {height: labelH, lineHeight: labelH}]}>
+          周平均心情指数
+        </Text>
+      </View>
+    </ImageBackground>
   )
 }
-function Nav (prop) {
+function Nav (props) {
   return (
-    <View style={styles.nav}>
+    <View style={[styles.nav,{height: props.titleH}]}>
       <Image source={Vector_28} style={styles.nav_img} />
       <Text style={styles.nav_title}>历史心情指数</Text>
     </View>
@@ -363,24 +371,28 @@ const App = () => {
   }
   const windowWidth = useWindowDimensions().width
   const windowHeight = useWindowDimensions().height
+  
+  const ratH = windowHeight/designTotalH;
+  const zhuH = ratH * totalH;
+  const userInfoH = ratH * UserInfoDH
+  const userMarginTop = ratH * UserInfoMarginTopDH
+  const jianbianH = ratH * 291;
+  const titleH = ratH * titleDH ;
   const everyLineW = (windowWidth - 12*8 - 3*7) / 7;
-
-  const marginTop = windowHeight - 336 - 20 + 10 // 整个用户信息名片的高度
+  const statusBarHeight = StatusBar.currentHeight;
+  const marginTop = userInfoH + titleH + 14 // 整个用户信息名片的高度 + 标题栏 + 状态栏
 
   // console.log(marginTop)
   return (
-    <SafeAreaView>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <Nav />
-      
-      <ScrollView>
-        <UserInfo windowHeight={windowHeight} />
-        
-        <List array={array} everyLineW={everyLineW} />
-        
-      </ScrollView>
+    <SafeAreaView style={{backgroundColor:'white'}}>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor="rgba(196, 196, 196, 0.15)"/>
+        <LinearGradient colors={['rgba(196, 196, 196, 0.15)','rgba(196, 196, 196, 0)']} >
+          <Nav titleH={titleH}/>
+          <UserInfo windowHeight={windowHeight} userInfoH={userInfoH} windowWidth={windowWidth} userMarginTop={userMarginTop}/>
+        </LinearGradient>
+        <List array={array} everyLineW={everyLineW} zhuH={zhuH}/>
       <View style={[styles.line,{marginTop: marginTop}]}></View>
-      <View style={[styles.line,{marginTop: marginTop + totalH/2}]}></View>
+      <View style={[styles.line,{marginTop: marginTop + zhuH/2}]}></View>
     </SafeAreaView>
   )
 }
@@ -528,7 +540,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 6,
     marginRight: 6,
-    marginTop: 50,
+    marginTop: 4,
     height: 288,
     marginBottom: 100,
     zIndex: 2,
@@ -610,7 +622,7 @@ const styles = StyleSheet.create({
   },
 
   user_info: {
-    width: 390,
+   
     height: 399,
     display: 'flex',
     flexDirection: 'column',
@@ -618,6 +630,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
+    marginLeft: 8,
+    marginRight: 8
+
   },
   space: {
     flex: 1,
@@ -631,7 +646,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'center',
     marginTop: 44,
-    background: `url(${base2x})`,
   },
   user_icon: {
     width: 80,
@@ -686,7 +700,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 88,
+    height: 68
   },
   nav_img: {
     position: 'absolute',
@@ -712,7 +726,6 @@ const styles = StyleSheet.create({
     color: '#2D2F33',
   },
   line: {
-    marginTop: 400,
     borderBottomWidth: 2,
     borderStyle: 'solid',
     borderColor: '#F2F2F2',
